@@ -1,10 +1,18 @@
 import logging
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 
-app = Flask(__name__)
+# import time
+# from datetime import date, timedelta, datetime
+# from flask_restful import Resource
+# import two_factor
+# import random
+
+# Local imports
+from config import app, db, api
+from models import Uploads
 
 # Configure logging to display messages in the console
 app.logger.setLevel(logging.DEBUG)  # Set logging level to INFO
@@ -14,18 +22,6 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)  # Set logging level to INFO
 app.logger.addHandler(console_handler)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///uploads.db'
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-class UploadedFile(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    month = db.Column(db.String(20))
-    year = db.Column(db.Integer)
-    filename = db.Column(db.String(100))
-
-    def __repr__(self):
-        return f"<UploadedFile {self.id}>"
 
 @app.route('/')
 def index():
@@ -39,7 +35,7 @@ def upload():
     csv_file = request.files['file']
     
     # Check if a file with the same month and year exists in the database
-    existing_file = UploadedFile.query.filter_by(month=month, year=year).first()
+    existing_file = Uploads.query.filter_by(month=month, year=year).first()
 
     if existing_file:
         # File already exists, prompt the user to confirm overwrite or cancel
@@ -50,7 +46,7 @@ def upload():
     csv_file.save(os.path.join('uploads', filename))
     
     # Save file information to the database
-    file_record = UploadedFile(month=month, year=year, filename=filename)
+    file_record = Uploads(month=month, year=year, filename=filename)
     db.session.add(file_record)
     db.session.commit()
 
@@ -62,7 +58,7 @@ def check_if_exists():
     year = request.args.get('year')
 
     # Check if a file with the same month and year exists in the database
-    existing_file = UploadedFile.query.filter_by(month=month, year=year).first()
+    existing_file = Uploads.query.filter_by(month=month, year=year).first()
     if existing_file:
         return jsonify({'exists': True})
     else:
@@ -70,4 +66,4 @@ def check_if_exists():
 
 if __name__ == '__main__':
     # db.create_all()
-    app.run(debug=True)
+    app.run(port=5555, debug=True)

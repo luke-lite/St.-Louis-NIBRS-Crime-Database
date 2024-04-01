@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Uploader</title>
+</head>
+<body>
+
+    {% if overwrite %}
+    <script>
+        if (confirm('A file with the name "{{ filename }}" already exists. Do you want to overwrite the existing file?')) {
+            document.getElementById('overwrite-confirm').value = 'true';
+            document.getElementById('upload-form').submit();
+        } else {
+            alert('Upload canceled.');
+        }
+    </script>
+    {% endif %}
+
+    <h2>Upload CSV File</h2>
+    
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+
+        <p>
+            {{ form.month.label }}
+            {{ form.month }}
+            {% for error in form.month.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.year.label }}
+            {{ form.year }}
+            {% for error in form.year.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.csv_file.label }}
+            {{ form.csv_file }}
+            {% for error in form.csv_file.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.submit() }}
+        </p>
+    </form>
+</body>
+</html>

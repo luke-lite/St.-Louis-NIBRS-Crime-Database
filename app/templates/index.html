@@ -40,7 +40,7 @@
     <br><br>
     <button onclick="uploadFile()">Upload CSV</button>
  
-    <script>
+    <!-- <script>
         function uploadFile() {
             const month = document.getElementById('month').value;
             const year = document.getElementById('year').value;
@@ -95,68 +95,7 @@
             };
             xhr.send(formData);
         }
-
-
-
-
-
-
-
-
-
-
-        // function uploadFile() {
-        //     const month = document.getElementById('month').value;
-        //     const year = document.getElementById('year').value;
-        //     const fileInput = document.getElementById('fileInput');
-        //     const file = fileInput.files[0];
-        //     if (!file) {
-        //         alert('Please select a file.');
-        //         return;
-        //     }
-
-        //     // Construct filename
-        //     const filename = 'Crime' + month + year + '.csv';
-
-        //     // Form data preparation
-        //     const formData = new FormData();
-        //     formData.append('month', month);
-        //     formData.append('year', year);
-        //     formData.append('filename', filename);  // Pass filename to the backend
-        //     formData.append('file', file);
-
-        //     // AJAX request
-        //     const xhr = new XMLHttpRequest();
-        //     xhr.open('POST', '/upload', true);
-        //     xhr.onload = function () {
-        //         if (xhr.status === 200) {
-        //             alert('CSV file uploaded successfully!');
-        //         } else {
-        //             const response = JSON.parse(xhr.responseText);
-        //             console.log(response); // Log the server response for debugging
-        //             if (response.status === 'exists') {
-        //                 const confirmUpload = confirm(`A file with the name ${response.filename} already exists. Do you want to overwrite it?`);
-        //                 if (confirmUpload) {
-        //                     // Overwrite confirmed, re-send the upload request
-        //                     const overwriteXhr = new XMLHttpRequest();
-        //                     overwriteXhr.open('POST', '/upload', true);
-        //                     overwriteXhr.onload = function () {
-        //                         if (overwriteXhr.status === 200) {
-        //                             alert('CSV file uploaded successfully!');
-        //                         } else {
-        //                             alert('Error uploading CSV file.');
-        //                         }
-        //                     };
-        //                     overwriteXhr.send(formData);
-        //                 }
-        //             } else {
-        //                 alert('Error uploading CSV file.');
-        //             }
-        //         }
-        //     };
-        //     xhr.send(formData);
-        // }
-    </script>
+    </script> -->
 
 </body>
 </html>

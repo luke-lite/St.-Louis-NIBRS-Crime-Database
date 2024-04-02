@@ -7,21 +7,23 @@
 </head>
 <body>
 
-    {% if overwrite %}
+    <!-- {% if overwrite %}
     <script>
         if (confirm('A file with the name "{{ filename }}" already exists. Do you want to overwrite the existing file?')) {
             document.getElementById('overwrite-confirm').value = 'true';
             document.getElementById('upload-form').submit();
         } else {
+            document.getElementById('overwrite-confirm').value = 'false';
             alert('Upload canceled.');
         }
     </script>
-    {% endif %}
+    {% endif %} -->
 
     <h2>Upload CSV File</h2>
     
     <form id="upload-form" method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
+        <!-- <input type="hidden" name="confirmed" id="overwrite-confirm"> -->
 
         <p>
             {{ form.month.label }}

@@ -14,4 +14,4 @@ class UploadForm(FlaskForm):
     month = SelectField('Month', choices=month_choices, validators=[InputRequired()])
     year = SelectField('Year', choices=year_choices, validators=[InputRequired()])
     csv_file = FileField('CSV File', validators=[InputRequired(), FileAllowed(['csv'], '.csv only')])
-    submit = SubmitField('Upload')
+    sbmt = SubmitField('Upload')

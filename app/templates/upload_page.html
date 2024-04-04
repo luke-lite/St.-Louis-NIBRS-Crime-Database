@@ -5,50 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Uploader</title>
 </head>
-<body>
 
-    <!-- {% if overwrite %}
-    <script>
-        if (confirm('A file with the name "{{ filename }}" already exists. Do you want to overwrite the existing file?')) {
-            document.getElementById('overwrite-confirm').value = 'true';
-            document.getElementById('upload-form').submit();
-        } else {
-            document.getElementById('overwrite-confirm').value = 'false';
-            alert('Upload canceled.');
-        }
-    </script>
-    {% endif %} -->
+<body>
 
     <h2>Upload CSV File</h2>
     
-    <form id="upload-form" method="POST" enctype="multipart/form-data">
+    <form id="upload-form" method="POST" enctype="multipart/form-data", onsubmit="return validateForm(event)">
         {{ form.csrf_token }}
-        <!-- <input type="hidden" name="confirmed" id="overwrite-confirm"> -->
+        <input type="hidden" name="confirmed" id="overwrite-confirm">
 
         <p>
             {{ form.month.label }}
-            {{ form.month }}
+            {{ form.month(id="month") }}
             {% for error in form.month.errors %}
                 <span style="color: red;">{{ error }}</span>
             {% endfor %}
         </p>
         <p>
             {{ form.year.label }}
-            {{ form.year }}
+            {{ form.year(id="year") }}
             {% for error in form.year.errors %}
                 <span style="color: red;">{{ error }}</span>
             {% endfor %}
         </p>
         <p>
             {{ form.csv_file.label }}
-            {{ form.csv_file }}
+            {{ form.csv_file(id="csv_file") }}
             {% for error in form.csv_file.errors %}
                 <span style="color: red;">{{ error }}</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.submit() }}
+            {{ form.sbmt() }}
         </p>
     </form>
+
+    <script>
+        async function validateUpload() {
+            console.log('Validating upload...');
+            var month = document.getElementById('month').value;
+            var year = document.getElementById('year').value;
+            var fileInput = document.getElementById('csv_file').files[0];
+            var fileName = `Crime_${month}_${year}.csv`;
+
+            try {
+                const response = await fetch(`/check_file?filename=${encodeURIComponent(fileName)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.exists) {
+                        const confirmOverwrite = confirm('A file with the same name already exists. Do you want to overwrite it?');
+                        if (!confirmOverwrite) {
+                            return false; // Cancel upload
+                        }
+                    }
+                    // Proceed with the upload
+                    
+                    console.log(typeof document.getElementById('upload-form').submit());
+                    // console.log(document.getElementById('upload-form'));
+                    document.getElementById('upload-form').submit();
+                } else {
+                    console.error('Error checking file:', response.status);
+                }
+            } catch (error) {
+                console.error('Error checking file:', error);
+            }
+            return false; // Prevent default form submission
+        }
+
+        async function validateForm(event) {
+            console.log('Validating form...');
+            event.preventDefault(); // Prevent default form submission
+            const isValid = await validateUpload(); // Validate upload
+            if (isValid) {
+                const confirmed = confirm('A file with the same name already exists. Do you want to overwrite it?');
+                if (confirmed) {
+                    document.getElementById('overwrite-confirm').value = 'true';
+                    document.getElementById('upload-form').submit(); // Submit form
+                }
+            }
+        }
+    </script>
+
 </body>
 </html>

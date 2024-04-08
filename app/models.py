@@ -17,7 +17,7 @@ class UploadInfo(db.Model):
     
 class CrimeData(db.Model):
     __tablename__ = 'crime_data'
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    Id: so.Mapped[int] = so.mapped_column(primary_key=True)
     IncidentNum: so.Mapped[int] = so.mapped_column(sa.Integer(), index=True)
     IncidentDate: so.Mapped[datetime.date] = so.mapped_column(sa.Date(), index=True)
     TimeOccurred: so.Mapped[datetime.time] = so.mapped_column(sa.DateTime(), index=True)

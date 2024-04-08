@@ -12,6 +12,8 @@ flask-restful = "*"
 sqlalchemy-serializer = "*"
 python-dotenv = "*"
 flask-wtf = "*"
+pandas = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 

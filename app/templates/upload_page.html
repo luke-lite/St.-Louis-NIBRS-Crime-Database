@@ -42,7 +42,6 @@
 
     <script>
         async function validateUpload() {
-            console.log('Validating upload...');
             var month = document.getElementById('month').value;
             var year = document.getElementById('year').value;
             var fileInput = document.getElementById('csv_file').files[0];
@@ -59,9 +58,6 @@
                         }
                     }
                     // Proceed with the upload
-                    
-                    console.log(typeof document.getElementById('upload-form').submit());
-                    // console.log(document.getElementById('upload-form'));
                     document.getElementById('upload-form').submit();
                 } else {
                     console.error('Error checking file:', response.status);
@@ -73,7 +69,6 @@
         }
 
         async function validateForm(event) {
-            console.log('Validating form...');
             event.preventDefault(); // Prevent default form submission
             const isValid = await validateUpload(); // Validate upload
             if (isValid) {

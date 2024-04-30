@@ -16,11 +16,13 @@ def upload_page():
         month = form.month.data
         year = form.year.data
         csv_file = form.csv_file.data
-        filename = f"Crime_{month}_{year}.csv"  # Construct the filename
-        upload_path = os.path.join('uploads', secure_filename(filename))
-
+        filename = f"Crime_{month}_{year}"  # Construct the filename
+        filesrc = f"Crime_{month}_{year}.csv"
+        upload_path = os.path.join('uploads', secure_filename(filesrc))
         csv_file.save(upload_path)
+
         flash('File uploaded successfully!')
+        
         return "File uploaded successfully!"
 
     return render_template('upload_page.html', form=form)

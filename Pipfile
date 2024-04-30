@@ -15,6 +15,9 @@ flask-wtf = "*"
 pandas = "*"
 sqlalchemy = "*"
 ipykernel = "*"
+shapely = "*"
+matplotlib = "*"
+geopandas = "*"
 
 [dev-packages]
 

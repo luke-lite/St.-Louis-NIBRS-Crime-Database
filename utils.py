@@ -1,6 +1,6 @@
 import pandas as pd
 
-def clean_data(csv_loc, conn):
+def transform_data(csv_loc, conn):
     df = pd.read_csv(csv_loc)
     df = df.drop('IncidentTopSRS_UCR', axis=1)
     df.rename(columns={'CrimeAgainst': 'NIBRSCat',

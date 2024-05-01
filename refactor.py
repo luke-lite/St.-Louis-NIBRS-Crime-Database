@@ -1,6 +1,6 @@
 import pandas as pd
 
-class DataTransfomer():
+class DataTransformer():
     def __init__(self, filename, upload_path, conn):
         self.filename = filename
         self.upload_path = upload_path

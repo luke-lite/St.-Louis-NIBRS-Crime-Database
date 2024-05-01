@@ -18,6 +18,7 @@ ipykernel = "*"
 shapely = "*"
 matplotlib = "*"
 geopandas = "*"
+jupyter = "*"
 
 [dev-packages]
 

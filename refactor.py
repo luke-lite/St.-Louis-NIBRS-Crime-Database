@@ -1,15 +1,17 @@
 import pandas as pd
 
 class DataTransfomer():
-    def __init__(self, filename, conn):
+    def __init__(self, filename, upload_path, conn):
         self.filename = filename
+        self.upload_path = upload_path
         self.conn = conn
 
     def __str__(self):
         return f"DataTransformer Object: ({self.filename})"
 
-    def clean_data(self, csv_loc):
-        df = pd.read_csv(csv_loc)
+    def clean_data(self):
+        upload_path = self.upload_path
+        df = pd.read_csv(upload_path)
         df = df.drop('IncidentTopSRS_UCR', axis=1)
         df.rename(columns={'CrimeAgainst': 'NIBRSCat',
                            'NIBRS': 'NIBRSCode',
@@ -39,8 +41,6 @@ class DataTransfomer():
 
         df = df.reset_index(drop=True)
         self.df = df
-
-        return df
 
     def split_data(self):
         self.supp_df = self.df[self.df['Supplemented'] == 'Yes']
@@ -151,12 +151,19 @@ class DataTransfomer():
         # Return updated table
         updated_df = pd.read_sql_query("""
         SELECT IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-                NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
-                PrimaryLocation,SecondaryLocation,District,Neighborhood,
-                NeighborhoodNum,Latitude,Longitude,Supplemented,
-                SupplementDate,VictimNum,FirearmUsed,IncidentNature
+               NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
+               PrimaryLocation,SecondaryLocation,District,Neighborhood,
+               NeighborhoodNum,Latitude,Longitude,Supplemented,
+               SupplementDate,VictimNum,FirearmUsed,IncidentNature
         FROM crime_data
         """, conn)
         updated_df = updated_df.sort_values(['IncidentDate', 'IncidentNum'])
 
-    
+        return updated_df
+
+    def get_split_dfs(self):
+        supp_df = self.supp_df
+        unfound_df = self.unfound_df
+        new_df = self.new_df
+
+        return supp_df, unfound_df, new_df

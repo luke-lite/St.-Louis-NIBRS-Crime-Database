@@ -158,7 +158,8 @@ class DataTransformer():
                SupplementDate,VictimNum,FirearmUsed,IncidentNature
         FROM crime_data
         """, conn)
-        updated_df = updated_df.sort_values(['IncidentDate', 'IncidentNum'])
+        updated_df = updated_df.sort_values(['IncidentDate', 'IncidentNum']).reset_index(drop=True)
+        # updated_df = updated_df.reset_index(drop=True)
 
         return updated_df
 

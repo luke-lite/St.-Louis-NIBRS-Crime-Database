@@ -7,6 +7,12 @@ import sqlite3
 import pandas as pd
 from utils import DataTransformer
 
+appdir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.join(appdir, os.pardir))
+DB_LOC = os.environ.get('DB_LOC')
+UPLOAD_LOC = os.environ.get('UPLOAD_LOC')
+TEMP_LOC = os.environ.get('TEMP_LOC')
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -21,10 +27,10 @@ def upload_page():
         csv_file = form.csv_file.data
         filename = f"Crime_{month}_{year}"  # Construct the filename
         filesrc = f"Crime_{month}_{year}.csv"
-        upload_path = os.path.join('uploads', secure_filename(filesrc))
+        upload_path = os.path.join(basedir, UPLOAD_LOC, secure_filename(filesrc))
         csv_file.save(upload_path)
 
-        with sqlite3.connect('database.db') as conn:
+        with sqlite3.connect(DB_LOC) as conn:
             DT = DataTransformer(filename=filename,
                                  upload_path=upload_path,
                                  conn=conn)
@@ -33,11 +39,11 @@ def upload_page():
 
         # Save the updated DataFrame to a temporary CSV file
         temp_csv_filename = f"updated_data_{month}_{year}.csv"
-        temp_csv_path = os.path.join('temp', temp_csv_filename)
+        temp_csv_path = os.path.join(basedir, TEMP_LOC, temp_csv_filename)
         updated_df.to_csv(temp_csv_path, index=False)
 
         # Redirect to a new page after successful upload
-        return redirect(url_for('process_completed', filename=temp_csv_filename))
+        return redirect(url_for('process_completed', filename=temp_csv_filename, filepath=temp_csv_path))
 
     return render_template('upload_page.html', form=form)
 
@@ -47,7 +53,7 @@ def upload_page():
 def check_file():
     filename = request.args.get('filename', None)
     if filename:
-        upload_path = os.path.join('uploads', filename)
+        upload_path = os.path.join(basedir, UPLOAD_LOC, filename)
         file_exists = os.path.exists(upload_path)
         return jsonify({'exists': file_exists})
     else:
@@ -56,20 +62,9 @@ def check_file():
 
 @app.route('/process_completed/<filename>', methods=['GET'])
 def process_completed(filename):
-    # # Retrieve the DataFrame from the query string
-    # df = request.args.get('df')
-    # df = pd.read_json(request.args.get('df'))
+    filepath = request.args.get('filepath')
 
-    # # Here you can generate a new CSV file or do any other processing
-    # # For demonstration, let's just create a simple CSV file
-    # csv_data = df.to_csv(index=False)
-    
-    # # Serve the CSV file to the user for download
-    # return Response(
-    #     csv_data,
-    #     mimetype="text/csv",
-    #     headers={"Content-disposition":
-    #              f"attachment; filename=SLMPD_NIBRS_crime_updated_{month}_{year}.csv"})
-
-    # Serve the temporary CSV file to the user for download
-    return send_file(f'temp/{filename}', as_attachment=True)
+    if filepath:
+        return send_file(filepath, as_attachment=True)
+    else:
+        return "Filepath parameter is missing.", 400

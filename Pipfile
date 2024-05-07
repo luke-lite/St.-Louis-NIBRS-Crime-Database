@@ -10,6 +10,14 @@ flask-migrate = "*"
 flask-cors = "*"
 flask-restful = "*"
 sqlalchemy-serializer = "*"
+flask-wtf = "*"
+pandas = "*"
+sqlalchemy = "*"
+ipykernel = "*"
+shapely = "*"
+matplotlib = "*"
+geopandas = "*"
+jupyter = "*"
 
 [dev-packages]
 

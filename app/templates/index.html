@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Uploader</title>
+</head>
+<body>
+    <h2>Upload CSV File</h2>
+    <label for="month">Select Month:</label>
+    <select name="month" id="month">
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+    </select>
+    <br><br>
+    <label for="year">Select Year:</label>
+    <select name="year" id="year">
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
+        <option value="2031">2031</option>
+        <option value="2032">2032</option>
+        <option value="2033">2033</option>
+        <option value="2034">2033</option>
+    </select>
+    <br><br>
+    <input type="file" id="fileInput" accept=".csv" required>
+    <br><br>
+    <button onclick="uploadFile()">Upload CSV</button>
+ 
+    <!-- <script>
+        function uploadFile() {
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            // Construct filename
+            const filename = 'Crime' + month + year + '.csv';
+
+            // Check if file with the same month and year already exists
+            const checkIfExistsXhr = new XMLHttpRequest();
+            checkIfExistsXhr.open('GET', `/checkIfExists?month=${month}&year=${year}`, true);
+            checkIfExistsXhr.onload = function () {
+                if (checkIfExistsXhr.status === 200) {
+                    const response = JSON.parse(checkIfExistsXhr.responseText);
+                    if (response.exists) {
+                        const confirmUpload = confirm(`A file with the name ${filename} already exists. Do you want to overwrite it?`);
+                        if (confirmUpload) {
+                            // Overwrite confirmed, proceed with upload
+                            performUpload(filename, file);
+                        }
+                    } else {
+                        // No existing file found, proceed with upload
+                        performUpload(filename, file);
+                    }
+                } else {
+                    alert('Error checking if file exists.');
+                }
+            };
+            checkIfExistsXhr.send();
+        }
+
+        function performUpload(filename, file) {
+            // Form data preparation
+            const formData = new FormData();
+            formData.append('filename', filename);
+            formData.append('file', file);
+
+            // AJAX request to upload the file
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('CSV file uploaded successfully!');
+                } else {
+                    alert('Error uploading CSV file.');
+                }
+            };
+            xhr.send(formData);
+        }
+    </script> -->
+
+</body>
+</html>

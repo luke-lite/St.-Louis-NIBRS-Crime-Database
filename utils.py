@@ -1,5 +1,5 @@
 import pandas as pd
-import sqlite3
+# import sqlite3
 
 class DataTransformer():
     def __init__(self, filename, upload_path, conn):

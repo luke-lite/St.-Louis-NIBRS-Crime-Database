@@ -1,10 +1,10 @@
 from app import app
 import os
-from flask import render_template, flash, jsonify, request, redirect, url_for, Response, send_file
+from flask import render_template, jsonify, request, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 from app.forms import UploadForm
 import sqlite3
-import pandas as pd
+# import pandas as pd
 from utils import DataTransformer
 
 appdir = os.path.abspath(os.path.dirname(__file__))

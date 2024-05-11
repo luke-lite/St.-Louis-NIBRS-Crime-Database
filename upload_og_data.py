@@ -3,7 +3,7 @@ import sqlite3
 import pandas as pd
 import os
 
-db_loc = os.environ.get('DB_LOC')
+DB_LOC = os.environ.get('DB_LOC')
 
 df = pd.read_csv('data/uploads/Crime2021-2023.csv')
 
@@ -15,8 +15,11 @@ INSERT INTO crime_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
                         SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
 
+meta_query = """
+INSERT INTO meta_data (LastUpdated) VALUES ('December 2023')"""
+
 # get tuples for the add query
 df_rows = [tuple(x) for x in df.itertuples(index=False)]
 
-with sqlite3.connect(db_loc) as conn:
+with sqlite3.connect(DB_LOC) as conn:
     conn.executemany(add_df_query, df_rows)

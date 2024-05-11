@@ -68,3 +68,7 @@ def process_completed(filename):
         return send_file(filepath, as_attachment=True)
     else:
         return "Filepath parameter is missing.", 400
+    
+@app.route('/mock')
+def mock():
+    return render_template('mock.html')

@@ -70,3 +70,9 @@ class UnfoundedCrimeData(db.Model):
 
     def __repr__(self):
         return '<Incident Number: {}>'.format(self.IncidentNum)
+    
+class MetaData(db.Model):
+    __tablename__ = 'meta_data'
+
+    Idx: so.Mapped[int] = so.mapped_column(sa.Integer(), primary_key=True)
+    LastUpdated: so.Mapped[datetime.time] = so.mapped_column(sa.DateTime(), nullable=True)

@@ -32,7 +32,7 @@ def upload_page():
 
         with sqlite3.connect(DB_LOC) as conn:
             DT = DataTransformer(filename=filename,
-                                 upload_path=upload_path,
+                                 filepath=upload_path,
                                  conn=conn)
             DT.full_update()
             updated_df = DT.get_updated_df()

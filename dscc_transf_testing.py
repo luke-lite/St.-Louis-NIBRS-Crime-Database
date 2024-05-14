@@ -4,7 +4,7 @@ from utils import DataTransformer
 # Connect to SQLite database
 with sqlite3.connect('database.db') as conn:
     DT = DataTransformer(filename='Crime_01_2024',
-                         upload_path='uploads/Crime_01_2024.csv',
+                         filepath='uploads/Crime_01_2024.csv',
                          conn=conn)
     
     DT.clean_data()

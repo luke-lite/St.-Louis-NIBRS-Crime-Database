@@ -2,17 +2,17 @@ import pandas as pd
 # import sqlite3
 
 class DataTransformer():
-    def __init__(self, filename, upload_path, conn):
+    def __init__(self, filename, filepath, conn):
         self.filename = filename
-        self.upload_path = upload_path
+        self.filepath = filepath
         self.conn = conn
 
     def __str__(self):
         return f"DataTransformer Object: ({self.filename})"
 
     def clean_data(self):
-        upload_path = self.upload_path
-        df = pd.read_csv(upload_path)
+        filepath = self.filepath
+        df = pd.read_csv(filepath)
         df = df.drop('IncidentTopSRS_UCR', axis=1)
         df.rename(columns={'CrimeAgainst': 'NIBRSCat',
                            'NIBRS': 'NIBRSCode',

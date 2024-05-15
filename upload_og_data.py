@@ -3,7 +3,7 @@ import sqlite3
 import pandas as pd
 import os
 
-DB_LOC = 'instance/database.db'
+DB_LOC = os.environ.get('DB_LOC')
 
 df = pd.read_csv('data/uploads/Crime2021-2023.csv')
 

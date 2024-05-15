@@ -4,7 +4,7 @@ from flask import render_template, jsonify, request, redirect, url_for, send_fil
 from werkzeug.utils import secure_filename
 from app.forms import UploadForm
 import sqlite3
-# import pandas as pd
+import pandas as pd
 from utils import DataTransformer
 
 appdir = os.path.abspath(os.path.dirname(__file__))
@@ -72,3 +72,39 @@ def process_completed(filename):
 @app.route('/mock')
 def mock():
     return render_template('mock.html')
+
+@app.route('/download_page')
+def download_page():
+    return render_template('download_page.html')
+
+# Route to handle CSV download
+@app.route('/get_csv')
+def get_csv():
+    db_path = os.path.join(basedir, DB_LOC)
+    with sqlite3.connect(db_path) as conn:
+        last_updated = pd.read_sql_query("SELECT LastUpdated FROM meta_data", conn)
+        updated_df = pd.read_sql_query("""
+        SELECT IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
+                NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
+                PrimaryLocation,SecondaryLocation,District,Neighborhood,
+                NeighborhoodNum,Latitude,Longitude,Supplemented,
+                SupplementDate,VictimNum,FirearmUsed,IncidentNature
+        FROM crime_data
+        """, conn)
+
+    updated_df = updated_df.sort_values(['IncidentDate', 'IncidentNum']).reset_index(drop=True)
+    last_update = last_updated.iloc[0,0]
+    csv_filename = 'STLCrime_updated' + last_update + '.csv'
+    csv_path = os.path.join(basedir, TEMP_LOC, csv_filename)
+    updated_df.to_csv(csv_path)
+
+    # Send the file as an attachment
+    response = send_file(csv_path, as_attachment=True)
+    
+    # Delete the CSV file after sending
+    os.remove(csv_path)
+    
+    return response
+
+if __name__ == '__main__':
+    app.run(debug=True)

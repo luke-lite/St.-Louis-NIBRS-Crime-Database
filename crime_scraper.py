@@ -2,13 +2,15 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import sqlite3
+import os
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from utils import DataTransformer
 
 base_url = 'https://www.slmpd.org/'
 page_url = 'https://www.slmpd.org/crime_stats.shtml'
-DB_LOC = 'instance/database.db'
+DB_LOC = os.environ.get('DB_LOC')
+UPLOAD_LOC='data/uploads'
 
 with sqlite3.connect(DB_LOC) as conn:
     last_updated = pd.read_sql_query("SELECT LastUpdated FROM meta_data", conn)
@@ -31,9 +33,7 @@ if next_month_string in tail_url:
     csv_link = base_url + tail_url
     response = requests.get(csv_link)
     
-    loc = 'data/temp/'
-    filepath = loc + filename + '.csv'
-    
+    filepath = UPLOAD_LOC + filename + '.csv'
     with open(filepath, 'wb') as f:
         f.write(response.content)
     

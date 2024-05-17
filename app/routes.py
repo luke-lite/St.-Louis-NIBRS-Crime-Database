@@ -75,7 +75,12 @@ def mock():
 
 @app.route('/download_page')
 def download_page():
-    return render_template('download_page.html')
+    db_path = os.path.join(basedir, DB_LOC)
+    with sqlite3.connect(db_path) as conn:
+        last_updated = pd.read_sql_query("SELECT LastUpdated FROM meta_data", conn)
+    last_update = last_updated.iloc[0,0]
+    formatted_date = f"{last_update[:-4]} {last_update[-4:]}"
+    return render_template('download_page.html', last_update=formatted_date)
 
 # Route to handle CSV download
 @app.route('/get_csv')
@@ -85,7 +90,7 @@ def get_csv():
         last_updated = pd.read_sql_query("SELECT LastUpdated FROM meta_data", conn)
         updated_df = pd.read_sql_query("""
         SELECT IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-                NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
+                NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
                 PrimaryLocation,SecondaryLocation,District,Neighborhood,
                 NeighborhoodNum,Latitude,Longitude,Supplemented,
                 SupplementDate,VictimNum,FirearmUsed,IncidentNature

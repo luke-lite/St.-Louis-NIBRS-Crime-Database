@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 # import sqlite3
 
 class DataTransformer():
@@ -6,6 +7,14 @@ class DataTransformer():
         self.filename = filename
         self.filepath = filepath
         self.conn = conn
+        self.add_query = """
+        INSERT INTO crime_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
+                                NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
+                                PrimaryLocation,SecondaryLocation,District,Neighborhood,
+                                NeighborhoodNum,Latitude,Longitude,Supplemented,
+                                SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """
 
     def __str__(self):
         return f"DataTransformer Object: ({self.filename})"
@@ -17,7 +26,6 @@ class DataTransformer():
         df.rename(columns={'CrimeAgainst': 'NIBRSCat',
                            'NIBRS': 'NIBRSCode',
                            'NIBRSCategory':'NIBRSOffenseType',
-                           'SRS_UCR':'UCR_SRS',
                            'OccurredFromTime':'TimeOccurred',
                            'Offense':'SLMPDOffense',
                            'FelMisdCit':'CrimeGrade',
@@ -28,7 +36,7 @@ class DataTransformer():
                            'LastSuppDate':'SupplementDate'}, inplace=True)
         
         ordered_cols = ['IncidentNum', 'IncidentDate', 'TimeOccurred', 'SLMPDOffense',
-                        'NIBRSCode', 'NIBRSCat', 'NIBRSOffenseType', 'UCR_SRS', 'CrimeGrade',
+                        'NIBRSCode', 'NIBRSCat', 'NIBRSOffenseType', 'SRS_UCR', 'CrimeGrade',
                         'PrimaryLocation', 'SecondaryLocation', 'District', 'Neighborhood',
                         'NeighborhoodNum', 'Latitude', 'Longitude', 'Supplemented',
                         'SupplementDate', 'VictimNum', 'FirearmUsed', 'IncidentNature']
@@ -48,10 +56,35 @@ class DataTransformer():
         self.unfound_df = self.df[(self.df['Supplemented'].isna()) & (self.df['SLMPDOffense'] == 'UNFOUNDED INCIDENT')]
         self.new_df = self.df[self.df['Supplemented'] == 'No']
 
-    def integrity_check(self):
+    def check_integrity(self):
         if len(self.df) != len(self.supp_df) + len(self.unfound_df) + len(self.new_df):
             # to-do: automate an error message email.
-            print("Something doesn't add up")
+            raise ValueError("Discrepancy found with `split_data()`: df lengths do not match.")
+
+    def update_db_initial(self):
+        supp_df = self.supp_df
+        unfound_df = self.unfound_df
+        new_df = self.new_df
+        conn = self.conn
+
+        add_supp_query = self.add_query
+        all_rows = [tuple(x) for x in supp_df.itertuples(index=False)]
+        conn.executemany(add_supp_query, all_rows)
+
+        add_unfounded_query = """
+        INSERT INTO unfounded_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
+                                    NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
+                                    PrimaryLocation,SecondaryLocation,District,Neighborhood,
+                                    NeighborhoodNum,Latitude,Longitude,Supplemented,
+                                    SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """
+        all_rows = [tuple(x) for x in unfound_df.itertuples(index=False)]
+        conn.executemany(add_unfounded_query, all_rows)
+
+        add_new_query = self.add_query
+        new_rows = [tuple(x) for x in new_df.itertuples(index=False)]
+        conn.executemany(add_new_query, new_rows)
 
     def update_db_from_supp(self):
         supp_df = self.supp_df
@@ -65,14 +98,7 @@ class DataTransformer():
         """
         conn.execute(delete_query)
 
-        add_supp_query = """
-        INSERT INTO crime_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-                                NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
-                                PrimaryLocation,SecondaryLocation,District,Neighborhood,
-                                NeighborhoodNum,Latitude,Longitude,Supplemented,
-                                SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """
+        add_supp_query = self.add_query
 
         # get tuples of each df row for the add query
         new_rows = [tuple(x) for x in supp_df.itertuples(index=False)]
@@ -98,10 +124,10 @@ class DataTransformer():
         """
         conn.execute(unfounded_delete_query)
 
-
+        # insert into different table than the self.add_query
         add_unfounded_query = """
         INSERT INTO unfounded_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-                                    NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
+                                    NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
                                     PrimaryLocation,SecondaryLocation,District,Neighborhood,
                                     NeighborhoodNum,Latitude,Longitude,Supplemented,
                                     SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
@@ -126,21 +152,28 @@ class DataTransformer():
         """
         conn.execute(delete_query)
         
-        add_new_query = """
-        INSERT INTO crime_data (IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-                                NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
-                                PrimaryLocation,SecondaryLocation,District,Neighborhood,
-                                NeighborhoodNum,Latitude,Longitude,Supplemented,
-                                SupplementDate,VictimNum,FirearmUsed,IncidentNature) 
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """
+        add_new_query = self.add_query
 
         # get tuples for the add query
         new_rows = [tuple(x) for x in new_df.itertuples(index=False)]
         conn.executemany(add_new_query, new_rows)
 
         conn.execute("DROP TABLE IF EXISTS new_temp")
-    
+
+    def update_metadata(self):
+        conn = self.conn
+        filename = self.filename
+
+        if '2021-2023' in filename:
+            update_date = 'December2023'
+        else:
+            date = filename.strip('Crime-').strip('.csv')
+            date_obj = datetime.strptime(date, '%m-%Y')
+            update_date = date_obj.strftime('%B%Y')
+
+        date_df = pd.DataFrame(data=[[update_date]], columns=['LastUpdated'])
+
+        date_df.to_sql('meta_data', conn, if_exists='replace', index=False)
 
     def commit_to_db(self):
         self.conn.commit()
@@ -152,7 +185,7 @@ class DataTransformer():
         # Return updated table
         updated_df = pd.read_sql_query("""
         SELECT IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
-               NIBRSCode,NIBRSCat,NIBRSOffenseType,UCR_SRS,CrimeGrade,
+               NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
                PrimaryLocation,SecondaryLocation,District,Neighborhood,
                NeighborhoodNum,Latitude,Longitude,Supplemented,
                SupplementDate,VictimNum,FirearmUsed,IncidentNature
@@ -163,6 +196,13 @@ class DataTransformer():
 
         return updated_df
 
+    
+    def get_lastupdated(self):
+        conn = self.conn
+        last_updated = pd.read_sql_query("SELECT LastUpdated FROM meta_data", conn)
+
+        return last_updated
+
     def get_split_dfs(self):
         supp_df = self.supp_df
         unfound_df = self.unfound_df
@@ -170,11 +210,12 @@ class DataTransformer():
 
         return supp_df, unfound_df, new_df
     
-    def full_update(self):  
+    def automated_update(self):  
         self.clean_data()
         self.split_data()
-        self.integrity_check()
+        self.check_integrity()
         self.update_db_from_supp()
         self.update_db_from_unfound()
         self.update_db_from_new()
+        self.update_metadata()
         self.commit_to_db()

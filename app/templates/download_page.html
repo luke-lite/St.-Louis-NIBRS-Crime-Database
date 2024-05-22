@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -49,16 +49,84 @@
         <p>Last updated: {{ last_update }}</p>
         <p>
             <strong>Instructions:</strong><br>
-            Click the Download button to receive a csv file that contains data on all crimes that occurred within the city of St. Louis dating back to January 2021.
+            Click the Download button to receive a CSV file that contains data on all crimes that occurred within the city of St. Louis dating back to January 2021--the point at which all US law enforcement agencies were required to switch from the SRS to the NIBRS crime reporting system.  The change in reporting systems also means that comparison to crime rates prior to 2021 is not recommended without detailed knowledge of the differences between the two systems.
         </p>
         <p>
             <strong>Background:</strong><br>
-            I was working with a St. Louis non-profit that needed crime data within a specific geographic area within St. Louis county. Unfortunately, the crime data that is made available by STLMPD is limited: there are PFDs with monthly breakdowns by neighborhood and category (too vague to be useful for my purpose), as well as CSVs with more detailed monthly "updates". But the CSVs are a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months, which is only useful if you have all the data from previous months. In order to use the data, I needed to create a database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
+            I was working with a St. Louis non-profit that needed crime data within a specific geographic area in St. Louis. Unfortunately, the crime data that is made available by SLMPD is limited: there are PDFs with monthly totals by neighborhood and category, as well as CSVs with more detailed monthly "updates". But the CSVs are a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months, which is only useful if you have all of the data from previous months. In order to use the data, I needed to create a comprehensive database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
         </p>
         <p>
-            <strong>Data Breakdown:</strong><br>
-            The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates related to all crimes that occurred in St. Louis county. The database is automatically updated as new data is available, though it sometimes takes a few days for the changes to be made since the web scraper only checks the STLMPD site on a weekly basis. Check the Data Sheet for a detailed breakdown of what the csv contains.
+            <strong>Data Overview:</strong><br>
+            The downloadable CSV includes all reported crime incidents in the city of St. Louis (does not include St. Louis county). The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates <a href="https://www.slmpd.org/crime_stats.shtml">here</a> containing all crime incidents in the city. My database automatically updates as new data is made available, though it sometimes takes a few days for the updates to be reflected since the web scraper only checks the SLMPD site on a weekly basis. See the <a href="/....googledoc.....">Data Sheet</a> for a detailed breakdown of what the csv contains.
+        </p>
+        <p>
+            <strong>Technical Breakdown:</strong><br>
+            This is an open-source app written in Python. For a complete walk-through of the backend code, check out the GitHub repo. The app exists on an AWS EC2 instance. It uses Flask to execute the backend code and a SQLite database stores the data. Clicking the download button above triggers a call to the database. The data is then processed and given to the user as a CSV.
         </p>
     </div>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St. Louis NIBRS Crime Database</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title text-center text-primary">Title of Your Flask App</h1>
+                <div class="text-center mb-3">
+                    <a href="/get_csv" class="btn btn-custom">Download CSV</a>
+                </div>
+                <p class="text-muted text-center">Last updated: {{ last_update }}</p>
+                <p>
+                    <strong>Instructions:</strong><br>
+                    Click the Download button to receive a CSV file that contains data on all crimes that occurred within the city of St. Louis dating back to January 2021--the point at which all US law enforcement agencies were required to switch from the SRS to the NIBRS crime reporting system. The change in reporting systems also means that comparison to crime rates prior to 2021 is not recommended without detailed knowledge of the differences between them.
+                </p>
+                <p>
+                    <strong>Background:</strong><br>
+                    I was working with a St. Louis non-profit that needed crime data within a specific geographic area in St. Louis. Unfortunately, the crime data that is made available by SLMPD is limited: there are PDFs with monthly totals by neighborhood and category, as well as CSVs with more detailed monthly "updates". But the CSVs are a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months, which is only useful if you have all of the data from previous months. In order to use the data, I needed to create a comprehensive database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
+                </p>
+                <p>
+                    <strong>Data Overview:</strong><br>
+                    The downloadable CSV includes all reported crime incidents in the city of St. Louis (does not include St. Louis county). The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates <a href="https://www.slmpd.org/crime_stats.shtml">here</a>. This database updates automatically as new data is made available, though it may take a few days for the updates to be reflected since the web scraper only checks the SLMPD site on a weekly basis. See the <a href="/....googledoc.....">Data Sheet</a> for a detailed breakdown of what the csv contains.
+
+                    The CSV download currently excludes all crime incidents that are determined by the SLMPD to be "unfounded." However, the database still tracks all unfounded incidents in a separate table, so if there is interest I can include a way to access that data as well.
+                </p>
+                <p>
+                    <strong>Technical Breakdown:</strong><br>
+                    This is an open-source app written in Python. For a complete walk-through of the code, check out the <a href="/....github.....">GitHub repo</a>. The app exists on an AWS EC2 instance. It uses Flask to execute the backend code, an SQLite database to store the data, and Bootstrap to style the frontend. Clicking the download button above triggers a call to the database. The data is then processed and given to the user as a CSV.
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

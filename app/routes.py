@@ -6,6 +6,7 @@ from app.forms import UploadForm
 import sqlite3
 import pandas as pd
 from utils import DataTransformer
+import io
 
 appdir = os.path.abspath(os.path.dirname(__file__))
 basedir = os.path.abspath(os.path.join(appdir, os.pardir))
@@ -110,6 +111,32 @@ def get_csv():
     os.remove(csv_path)
     
     return response
+
+@app.route('/preview_data')
+def preview_data():
+    db_path = os.path.join(basedir, DB_LOC)
+    with sqlite3.connect(db_path) as conn:
+        preview_df = pd.read_sql_query("""
+        SELECT IncidentNum,IncidentDate,TimeOccurred,SLMPDOffense,
+                NIBRSCode,NIBRSCat,NIBRSOffenseType,SRS_UCR,CrimeGrade,
+                PrimaryLocation,SecondaryLocation,District,Neighborhood,
+                NeighborhoodNum,Latitude,Longitude,Supplemented,
+                SupplementDate,VictimNum,FirearmUsed,IncidentNature
+        FROM crime_data
+        """, conn)
+
+    preview_df = preview_df.sort_values(['IncidentDate', 'IncidentNum']).reset_index(drop=True)
+
+    # Get the HTML representation of the first few rows of the DataFrame
+    preview_df_html = preview_df.head().to_html(classes='table table-striped table-bordered')
+
+    # Capture the output of df.info()
+    buffer = io.StringIO()
+    preview_df.info(buf=buffer)
+    df_info_str = buffer.getvalue().replace('\n', '<br>')
+    
+    # Return the HTML wrapped in a simple template
+    return render_template('preview_data.html', table=preview_df_html, df_info=df_info_str)
 
 if __name__ == '__main__':
     app.run(debug=True)

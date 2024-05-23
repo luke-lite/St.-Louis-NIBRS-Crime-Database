@@ -20,6 +20,3 @@ sql_testing.ipynb
 *.log
 *.gz
 *.zip
-
-# Pipenv files (if using pipenv, you may not need this as dependencies are managed in Dockerfile)
-Pipfile.lock

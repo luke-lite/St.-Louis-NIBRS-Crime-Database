@@ -1,0 +1,25 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+.env
+.venv
+venv/
+
+.git
+.gitignore
+
+.DS_Store
+
+.ipynb_checkpoints
+db_testing.ipynb
+sql_testing.ipynb
+
+# Exclude large files or folders not needed at runtime
+*.log
+*.gz
+*.zip
+
+# Pipenv files (if using pipenv, you may not need this as dependencies are managed in Dockerfile)
+Pipfile.lock

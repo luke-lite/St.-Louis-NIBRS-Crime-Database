@@ -139,4 +139,5 @@ def preview_data():
     return render_template('preview_data.html', table=preview_df_html, df_info=df_info_str)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)

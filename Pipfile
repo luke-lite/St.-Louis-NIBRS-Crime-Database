@@ -17,6 +17,7 @@ shapely = "*"
 matplotlib = "*"
 geopandas = "*"
 jupyter = "*"
+gunicorn = "*"
 
 [dev-packages]
 

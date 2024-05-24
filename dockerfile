@@ -15,4 +15,5 @@ RUN pip install pipenv && pipenv install --deploy --ignore-pipfile
 COPY . .
 
 # Run the application
-CMD ["pipenv", "run", "python", "server.py"]
+# CMD ["pipenv", "run", "python", "server.py"]
+CMD ["pipenv", "run", "gunicorn", "--bind", "0.0.0.0:8080", "app:app"]

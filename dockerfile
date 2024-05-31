@@ -1,27 +1,34 @@
-# Use the official lightweight Python image for Python 3.10.
-# https://hub.docker.com/_/python
+# Use an official Python runtime as a parent image
 FROM python:3.10-slim
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy Pipfile and Pipfile.lock
-COPY Pipfile Pipfile.lock ./
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install pipenv and project dependencies
-RUN pip install pipenv && pipenv install --deploy --ignore-pipfile
+# Install pipenv
+RUN pip install --upgrade pip
+RUN pip install pipenv
 
-# Copy the rest of the application code
-COPY . .
+# Copy the Pipfile and Pipfile.lock into the container at /app
+COPY Pipfile Pipfile.lock /app/
+
+# Install dependencies
+RUN pipenv install --deploy --ignore-pipfile
+
+# Copy the rest of the application code into the container at /app
+COPY . /app
 
 # Initialize and upgrade the database
-RUN pipenv run flask db init || true  # Allow failure if already initialized
-RUN pipenv run flask db migrate || true  # Allow failure if no changes
+RUN pipenv run flask db init
+RUN pipenv run flask db migrate
 RUN pipenv run flask db upgrade
 RUN pipenv run python backfill_db.py
 
-# Run the application
+# Define the command to run the application
+# CMD ["pipenv", "run", "python", "app.py"]
 CMD ["pipenv", "run", "gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
-
-# Run the application locally:
-# CMD ["pipenv", "run", "python", "server.py"]

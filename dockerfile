@@ -31,4 +31,4 @@ RUN pipenv run python backfill_db.py
 
 # Define the command to run the application
 # CMD ["pipenv", "run", "python", "app.py"]
-CMD ["pipenv", "run", "gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+CMD ["pipenv", "run", "gunicorn", "-w", "4" ,"-b", "0.0.0.0:8080", "wsgi:app"]

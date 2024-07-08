@@ -46,6 +46,7 @@
                 <p>
                     <strong>Data Preview:</strong><br>
                 </p>
+                <p class="text-muted text-center">Last updated: {{ last_update }}</p>
                 <div class="data-preview">
                     {{ sample_data_html | safe }}
                 </div>
@@ -55,17 +56,17 @@
                 </p>
                 <p>
                     <strong>Background:</strong><br>
-                    I was working with a St. Louis non-profit that needed crime data within a specific geographic area in St. Louis. Unfortunately, the crime data that is made available by SLMPD is limited: there are PDFs with monthly totals by neighborhood and category, as well as CSVs with more detailed monthly "updates". But the CSVs are a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months, which is only useful if you have all of the data from previous months. In order to use the data, I needed to create a comprehensive database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
+                    I was working with a St. Louis non-profit that needed crime data within a specific geographic area in St. Louis. Unfortunately, the crime data that is made available by SLMPD is limited: there are PDFs with monthly totals by neighborhood and category, as well as CSVs with more detailed monthly "updates". But the CSVs are snapshots--a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months--which is only useful if you have all of the prior data. In order to make the data useful, I needed to create a comprehensive database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
                 </p>
                 <p>
                     <strong>Data Overview:</strong><br>
-                    The downloadable CSV includes all reported crime incidents in the city of St. Louis (does not include St. Louis county). The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates <a href="https://www.slmpd.org/crime_stats.shtml">here</a>. This database updates automatically as new data is made available, though it may take a few days for the updates to be reflected since the web scraper only checks the SLMPD site on a weekly basis. See the <a href="/....googledoc.....">Data Sheet</a> for a detailed breakdown of what the csv contains.
+                    The downloadable CSV includes all reported crime incidents in the city of St. Louis (does not include St. Louis county). The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates <a href="https://www.slmpd.org/crime_stats.shtml">here</a>. This database updates automatically as new data is made available, though it may take a few days for the updates to be reflected since the web scraper only checks the SLMPD site on a weekly basis.
 
                     The CSV download currently excludes all crime incidents that are determined by the SLMPD to be "unfounded." However, the database still tracks all unfounded incidents in a separate table, so if there is interest I can include a way to access that data as well.
                 </p>
                 <p>
                     <strong>Technical Breakdown:</strong><br>
-                    This is an open-source app written in Python. For a complete walk-through of the code, check out the <a href="/....github.....">GitHub repo</a>. The app exists on an AWS EC2 instance. It uses Flask to execute the backend code, an SQLite database to store the data, and Bootstrap to style the frontend. Clicking the download button above triggers a call to the database. The data is then processed and given to the user as a CSV.
+                    This is an open-source app written in Python. For a complete walk-through of the code, check out the <a href="https://github.com/luke-lite/STL-Data-Transformer-App">GitHub repo</a>. It uses Flask to execute the backend code, a PostgreSQL database to store the data, and Bootstrap to style the frontend. Clicking the download button above triggers a call to the database. The data is then processed and given to the user as a CSV.
                 </p>
             </div>
         </div>

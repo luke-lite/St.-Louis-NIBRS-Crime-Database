@@ -2,6 +2,71 @@ import pandas as pd
 from datetime import datetime
 from sqlalchemy import text
 from app.models import MetaData
+import os
+import requests
+import re
+from bs4 import BeautifulSoup
+import calendar
+
+UPLOAD_LOC = os.environ.get('UPLOAD_LOC')
+
+def validate_csv(html_element):
+    months = list(calendar.month_name)[1:]  # Skip the first empty string
+    regex_pattern = r'\b(' + '|'.join(months) + r')\s(\d{4})\b'
+    match = re.search(regex_pattern, html_element.text)
+    if match:
+        month = match.group(1)
+        year = match.group(2)
+        return month + ' ' + year
+    else:
+        raise ValueError("No valid 'Month Year' format found in the given HTML element.")
+
+def download_csv(url, filename):
+    response = requests.get(url)
+    filepath = os.path.join(UPLOAD_LOC, filename)
+    with open(filepath, 'wb') as f:
+        f.write(response.content)
+    return filepath
+
+def delete_csv(filepath):
+    try:
+        os.remove(filepath)
+        print(f"Deleted CSV file: {filepath}")
+    except OSError as e:
+        print(f"Error: {filepath} : {e.strerror}")
+
+def scrape_csv_elements(url: str) -> list:
+    '''
+    Takes the SLMPD crime stats url and returns
+    a list of the html elements of each crime-data CSV.
+    '''
+    try:
+        page = requests.get(url)
+        # Raise an HTTPError if the HTTP request returned an unsuccessful status code
+        page.raise_for_status()
+        soup = BeautifulSoup(page.content, "html.parser")
+
+        block = soup.find('div', attrs={'class': 'uagb-tabs__body-wrap'})
+        if not block:
+            raise ValueError("The specified div block was not found on the page.")
+        tabs = block.findAll('div')
+        if not tabs:
+            raise ValueError("No tabs found within the specified div block.")
+
+        crime_tab = tabs[-1]
+        entries = crime_tab.findAll('a')
+        if not entries:
+            raise ValueError("No entries found in the crime tab.")
+        
+        return entries
+    
+    except requests.RequestException as e:
+        print(f"An error occurred while making the HTTP request: {e}")
+    except ValueError as e:
+        print(f"A value error occurred: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
 
 class DataTransformer:
     def __init__(self, filename, filepath):
@@ -96,7 +161,6 @@ class DataTransformer:
         self.update_date = update_date
 
         # Fetch the existing record
-        # with session.no_autoflush:
         meta_data = session.query(MetaData).first()
 
         try:

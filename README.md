@@ -1,4 +1,4 @@
-# STL-Crime-Data-Server
+# St. Louis NIBRS Criem Database
 
 ## Overview:
 This project creates a comprehensive database containing NIBRS data on all crimes committed within the city of St. Louis, Missouri beginning from January 1, 2021, the date from which all law enforcement agencies were required to switch from UCR SRS crime reporting to the current NIBRS system. Because of the different reporting standards, comparisons to crime rates prior to 2021 is highly discouraged.

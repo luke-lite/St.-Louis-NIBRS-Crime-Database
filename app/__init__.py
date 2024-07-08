@@ -1,11 +1,30 @@
 from flask import Flask
-from config import Config
+from config import DevelopmentConfig, ProductionConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import os
 
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db = SQLAlchemy()
+migrate = Migrate()
 
-from app import routes, models
+def create_app():
+    app = Flask(__name__)
+
+    if os.environ.get('APP_MODE') == 'production':
+        app.config.from_object(ProductionConfig)
+    else:
+        app.config.from_object(DevelopmentConfig)
+
+    # Ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+    
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    with app.app_context():
+        from . import routes, models
+    
+    return app

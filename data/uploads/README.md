@@ -1,0 +1,1 @@
+This folder is where the raw data is temporarily stored as a CSV while the data is being processed and added to the database.The CSV is automatically deleted once the data processing has finished.

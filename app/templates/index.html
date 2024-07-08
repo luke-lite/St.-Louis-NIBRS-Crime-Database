@@ -1,101 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CSV Uploader</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St. Louis NIBRS Crime Database</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .data-preview {
+            max-height: 400px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+        .table thead th {
+        text-align: left;
+        }
+        .card-title {
+            color: black;
+        }
+    </style>
 </head>
 <body>
-    <h2>Upload CSV File</h2>
-    <label for="month">Select Month:</label>
-    <select name="month" id="month">
-        <option value="January">January</option>
-        <option value="February">February</option>
-        <option value="March">March</option>
-        <option value="April">April</option>
-        <option value="May">May</option>
-        <option value="June">June</option>
-        <option value="July">July</option>
-        <option value="August">August</option>
-        <option value="September">September</option>
-        <option value="October">October</option>
-        <option value="November">November</option>
-        <option value="December">December</option>
-    </select>
-    <br><br>
-    <label for="year">Select Year:</label>
-    <select name="year" id="year">
-        <option value="2024">2024</option>
-        <option value="2025">2025</option>
-        <option value="2026">2026</option>
-        <option value="2027">2027</option>
-        <option value="2028">2028</option>
-        <option value="2029">2029</option>
-        <option value="2030">2030</option>
-        <option value="2031">2031</option>
-        <option value="2032">2032</option>
-        <option value="2033">2033</option>
-        <option value="2034">2033</option>
-    </select>
-    <br><br>
-    <input type="file" id="fileInput" accept=".csv" required>
-    <br><br>
-    <button onclick="uploadFile()">Upload CSV</button>
- 
-    <!-- <script>
-        function uploadFile() {
-            const month = document.getElementById('month').value;
-            const year = document.getElementById('year').value;
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Please select a file.');
-                return;
-            }
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="card-title text-center title-black">St. Louis NIBRS Crime Database</h1>
+                <div class="text-center mb-3">
+                    <a href="/get_csv" class="btn btn-custom">Download CSV</a>
+                </div>
+                <p class="text-muted text-center">Last updated: {{ last_update }}</p>
+                <p>
+                    <strong>Data Preview:</strong><br>
+                </p>
+                <p class="text-muted text-center">Last updated: {{ last_update }}</p>
+                <div class="data-preview">
+                    {{ sample_data_html | safe }}
+                </div>
+                <p>
+                    <strong>Instructions:</strong><br>
+                    Click the Download button to receive a CSV file that contains data on all crimes that occurred within the city of St. Louis dating back to January 2021--the point at which all US law enforcement agencies were required to switch from the SRS to the NIBRS crime reporting system. The change in reporting systems also means that comparison to crime rates prior to 2021 is not recommended without detailed knowledge of the differences between them.
+                </p>
+                <p>
+                    <strong>Background:</strong><br>
+                    I was working with a St. Louis non-profit that needed crime data within a specific geographic area in St. Louis. Unfortunately, the crime data that is made available by SLMPD is limited: there are PDFs with monthly totals by neighborhood and category, as well as CSVs with more detailed monthly "updates". But the CSVs are snapshots--a mix of new crimes committed in the current month, as well as updates/changes to cases that occurred in previous months--which is only useful if you have all of the prior data. In order to make the data useful, I needed to create a comprehensive database that would automatically add new crime data and update previous crimes as more information was reported. Since I felt that this was data others might find useful, I decided to make the entire database available to the public.
+                </p>
+                <p>
+                    <strong>Data Overview:</strong><br>
+                    The downloadable CSV includes all reported crime incidents in the city of St. Louis (does not include St. Louis county). The raw data comes from the St. Louis Metropolitan Police Department, which posts monthly updates <a href="https://www.slmpd.org/crime_stats.shtml">here</a>. This database updates automatically as new data is made available, though it may take a few days for the updates to be reflected since the web scraper only checks the SLMPD site on a weekly basis.
 
-            // Construct filename
-            const filename = 'Crime' + month + year + '.csv';
-
-            // Check if file with the same month and year already exists
-            const checkIfExistsXhr = new XMLHttpRequest();
-            checkIfExistsXhr.open('GET', `/checkIfExists?month=${month}&year=${year}`, true);
-            checkIfExistsXhr.onload = function () {
-                if (checkIfExistsXhr.status === 200) {
-                    const response = JSON.parse(checkIfExistsXhr.responseText);
-                    if (response.exists) {
-                        const confirmUpload = confirm(`A file with the name ${filename} already exists. Do you want to overwrite it?`);
-                        if (confirmUpload) {
-                            // Overwrite confirmed, proceed with upload
-                            performUpload(filename, file);
-                        }
-                    } else {
-                        // No existing file found, proceed with upload
-                        performUpload(filename, file);
-                    }
-                } else {
-                    alert('Error checking if file exists.');
-                }
-            };
-            checkIfExistsXhr.send();
-        }
-
-        function performUpload(filename, file) {
-            // Form data preparation
-            const formData = new FormData();
-            formData.append('filename', filename);
-            formData.append('file', file);
-
-            // AJAX request to upload the file
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/upload', true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    alert('CSV file uploaded successfully!');
-                } else {
-                    alert('Error uploading CSV file.');
-                }
-            };
-            xhr.send(formData);
-        }
-    </script> -->
-
+                    The CSV download currently excludes all crime incidents that are determined by the SLMPD to be "unfounded." However, the database still tracks all unfounded incidents in a separate table, so if there is interest I can include a way to access that data as well.
+                </p>
+                <p>
+                    <strong>Technical Breakdown:</strong><br>
+                    This is an open-source app written in Python. For a complete walk-through of the code, check out the <a href="https://github.com/luke-lite/STL-Data-Transformer-App">GitHub repo</a>. It uses Flask to execute the backend code, a PostgreSQL database to store the data, and Bootstrap to style the frontend. Clicking the download button above triggers a call to the database. The data is then processed and given to the user as a CSV.
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

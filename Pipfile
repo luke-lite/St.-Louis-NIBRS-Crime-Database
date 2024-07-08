@@ -13,10 +13,9 @@ flask-wtf = "*"
 pandas = "*"
 sqlalchemy = "*"
 ipykernel = "*"
-shapely = "*"
 matplotlib = "*"
-geopandas = "*"
 jupyter = "*"
+gunicorn = "*"
 
 [dev-packages]
 

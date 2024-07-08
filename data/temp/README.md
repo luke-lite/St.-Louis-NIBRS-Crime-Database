@@ -1,0 +1,1 @@
+This folder is where user-requested CSVs are temporarily stored.The CSVs are automatically deleted once they have been sent to the user.
